@@ -130,19 +130,6 @@ sam deploy --guided --template-file infra/template.yaml --capabilities CAPABILIT
 5. Ejecuta el verificador contra esa URL para obtener evidencia AWS. Las metas de latencia deben medirse allí; los arranques en frío Java pueden superar las metas del avance.
 6. El frontend se puede ejecutar localmente contra AWS o servir su carpeta browser en hosting estático HTTPS. Para otro origen, actualiza CorsOrigin, vuelve a desplegar y modifica public/config.json antes de compilar, o usa la pantalla de conexión.
 
-No es necesario `sam build`: la plantilla referencia el JAR lambda generado por Maven; `sam deploy` empaqueta y sube ese archivo.
-
-### Trazabilidad y recuperación
-
-La recepción hace una escritura condicional en DynamoDB. DynamoDB Streams publica INSERT a SQS mediante una Lambda adicional. Así, el guardado y la intención de encolar son durables, sin depender de dos escrituras independientes en la API.
-
-SQS entrega al menos una vez. El procesador utiliza comparación condicional del registro, una concesión de 90 segundos y rutas de archivo estables. Los estados ACEPTADO/RECHAZADO no se reprocesan. Si hay un trabajador activo, la entrega se reintenta. La visibilidad de SQS es de 180 segundos frente al timeout Lambda de 30 segundos. Se reportan fallos parciales por mensaje para no repetir el lote entero.
-
-Tras 5 entregas fallidas el mensaje pasa a la DLQ; el documento queda ERROR (o PROCESANDO hasta que expire su concesión si hubo timeout). Revisa CloudWatch y corrige la causa antes de usar la función de redrive de SQS. En local se permiten hasta 5 errores por documento y quedan registrados en el historial.
-
-El stream conserva eventos por 24 horas. La alarma PublisherLagAlarm avisa en CloudWatch cuando el retraso supera 60 segundos. Si una interrupción del publicador dura más de la retención, revisa registros RECIBIDO y vuelve a enviar sus documentId a QueueUrl usando SQS. La alarma de DLQ detecta mensajes pendientes. No se configuró correo SNS: las alarmas se consultan en CloudWatch y la notificación funcional se realiza por consulta de estado, como permite el avance.
-
-Logs de Lambda: retención de 14 días. Filtra por documentId; los errores incluyen stack trace. Los fallos en recepción incluyen requestId. Las alarmas no envían mensajes a destinatarios externos.
 
 ### Acceso y costos
 
@@ -166,6 +153,3 @@ Se crean recursos facturables, incluidos almacenamiento, backups, logs, alarmas 
 | Seguridad | API key, CORS explícito, rate limit y descargas autorizadas |
 | Concurrencia | Pruebas automatizadas y verificador HTTP de 20 solicitudes |
 
-La evidencia local no sustituye las capturas de API Gateway, S3, CloudWatch ni la prueba remota requeridas para sustentar el despliegue cloud. Para la sustentación: crea un comprobante, muestra RECIBIDO/ACEPTADO e historial, descarga XML/PDF, repite el envío, prueba una solicitud sin clave y ejecuta verify.mjs.
-
-Para la demo de bajo uso, consulta docs/AWS-ESCOLAR.md y la plantilla infra/template-escolar.yaml. Su despliegue requiere verificar primero la cobertura gratuita de la cuenta.
