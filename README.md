@@ -2,17 +2,12 @@
 
 Aplicación completa con frontend Angular y backend Java 17 / Spring Boot. Recibe comprobantes ficticios, valida importes con IGV de 18%, procesa en segundo plano y genera XML y PDF consultables. Es una simulación académica; no emite comprobantes legales ni se conecta con SUNAT.
 
-## Código y versionado
-
-Repositorio: [JeremyVera2005/Proyecto-nubixia](https://github.com/JeremyVera2005/Proyecto-nubixia). El versionado del proyecto completo comienza con la línea base del 26 de octubre de 2026. Subir código a GitHub no despliega automáticamente en AWS.
-
 ## Sitio en AWS
 
 Abre [Nubixia en AWS](https://0qx6ww77nl.execute-api.us-east-2.amazonaws.com/demo/).
 
-Frontend y backend funcionan en AWS; no necesitas mantener esta computadora encendida. Incluye landing page, logo nuevo, registro, confirmación de correo, inicio/cierre de sesión y recuperación de contraseña con Cognito Lite. Cada usuario ve sus propios comprobantes. La base y los archivos siguen en DynamoDB y S3 privado.
+Frontend y backend funcionan en AWS, Incluye landing page, logo nuevo, registro, confirmación de correo, inicio/cierre de sesión y recuperación de contraseña con Cognito Lite. Cada usuario ve sus propios comprobantes. La base y los archivos siguen en DynamoDB y S3 privado.
 
-La cuenta bloqueó CloudFront por verificación pendiente. Se publicó por HTTPS mediante API Gateway y Lambda. La plantilla operativa es `infra/template-web-api-auth.json`. Consulta estado del despliegue y autenticación.
 
 ## Iniciar en Windows para desarrollo local
 
