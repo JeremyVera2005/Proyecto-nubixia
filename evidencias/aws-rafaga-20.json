@@ -1,0 +1,416 @@
+{
+  "fecha": "2026-10-26T04:52:40.689Z",
+  "api": "https://0qx6ww77nl.execute-api.us-east-2.amazonaws.com/demo",
+  "entorno": "remoto",
+  "resultados": [
+    {
+      "nombre": "Acceso sin credencial rechazado",
+      "ok": true,
+      "detalle": 403
+    },
+    {
+      "nombre": "Total inconsistente rechazado",
+      "ok": true,
+      "detalle": 400
+    },
+    {
+      "nombre": "20 solicitudes concurrentes recibidas",
+      "ok": false,
+      "detalle": [
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        202,
+        500,
+        500,
+        202,
+        202,
+        202,
+        500,
+        500,
+        500,
+        500,
+        500
+      ]
+    },
+    {
+      "nombre": "20 documentId únicos",
+      "ok": false
+    },
+    {
+      "nombre": "Recepción menor a 2 segundos",
+      "ok": true,
+      "detalle": [
+        451,
+        600,
+        583,
+        516,
+        502,
+        618,
+        612,
+        588,
+        456,
+        580,
+        434,
+        439,
+        285,
+        372,
+        551,
+        433,
+        437,
+        439,
+        440,
+        432
+      ]
+    },
+    {
+      "nombre": "20 comprobantes aceptados sin pérdida",
+      "ok": false,
+      "detalle": [
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO",
+        "ACEPTADO"
+      ]
+    },
+    {
+      "nombre": "Procesamiento menor a 15 segundos",
+      "ok": false
+    },
+    {
+      "nombre": "Reenvío idempotente",
+      "ok": true
+    },
+    {
+      "nombre": "Duplicado con datos distintos rechazado",
+      "ok": true,
+      "detalle": 409
+    },
+    {
+      "nombre": "Descarga xml",
+      "ok": true,
+      "detalle": "587 bytes"
+    },
+    {
+      "nombre": "Descarga pdf",
+      "ok": true,
+      "detalle": "1138 bytes"
+    }
+  ],
+  "comprobantes": [
+    {
+      "documentId": "2ad7c074bf4597d7d74b2c7dfa8488dc5379d70c32e26319a99905a2fc9aa5a8",
+      "estado": "ACEPTADO",
+      "recepcionMs": 551,
+      "procesoMs": 383,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.575289890Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:22.852850659Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:22.958919603Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "f68600139b548024c6123cab00487e672d434db2f449b3c61e5c7b523a969c80",
+      "estado": "ACEPTADO",
+      "recepcionMs": 516,
+      "procesoMs": 2633,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.549231305Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:25.075841694Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:25.182768486Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "30d155297b4f25c65ec0d85ca556ae978ff9d47556ae672a46ed09949c587a5e",
+      "estado": "ACEPTADO",
+      "recepcionMs": 502,
+      "procesoMs": 675,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.524749868Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:23.048287838Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:23.199909336Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "60da4543170b1a7b62fe2dfaa2a2175328805e1e5c754d9073828a816e271386",
+      "estado": "ACEPTADO",
+      "recepcionMs": 588,
+      "procesoMs": 2915,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.492635862Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:25.288186754Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:25.407108699Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "bdc091ae80c4554dde12833c5d4376965301cd54d947d16c4a1844723f897e82",
+      "estado": "ACEPTADO",
+      "recepcionMs": 618,
+      "procesoMs": 1110,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.490513270Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:23.517786624Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:23.600645448Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "875f18469ea3988f5dfef4962c5580926a5e109f18beff4276e578a18b28cebc",
+      "estado": "ACEPTADO",
+      "recepcionMs": 583,
+      "procesoMs": 620,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.490487996Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:23.010576326Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:23.110821202Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "33762442f0c8e16769fa97195585748f474f9ac7a47ff19854d56b62283ad925",
+      "estado": "ACEPTADO",
+      "recepcionMs": 600,
+      "procesoMs": 3078,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.488767204Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:25.449850171Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:25.566721772Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "34bb3cd8bad820ac0f55b8dc56fe9aa356da89f8be9908636f3bd0dddfb61e11",
+      "estado": "ACEPTADO",
+      "recepcionMs": 612,
+      "procesoMs": 2971,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.488022063Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:25.374984927Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:25.459460406Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "b5d8e3607f2eebafbe5a0b57a177ac3108a90a12330cefefc801b56f44cf5019",
+      "estado": "ACEPTADO",
+      "recepcionMs": 580,
+      "procesoMs": 2854,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.487319216Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:25.252168492Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:25.341313066Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "4631e260ff3873b4057cbfddea413a609fe0c7c194b495321a6e09d04e2bf9eb",
+      "estado": "ACEPTADO",
+      "recepcionMs": 456,
+      "procesoMs": 1004,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.484290870Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:23.372635852Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:23.488693021Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "f6e2b259d5b0d0f43558eba68e397c9fe1b51e8bde156b71819038e9debc1e15",
+      "estado": "ACEPTADO",
+      "recepcionMs": 451,
+      "procesoMs": 902,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.474999203Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:23.230663339Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:23.376905938Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "f29f289ac75887e4ae62b2cbec149e035ee105ce3ac977ca13742943a5c9887b",
+      "estado": "ACEPTADO",
+      "recepcionMs": 372,
+      "procesoMs": 542,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.270846355Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:22.664976057Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:22.812375301Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    },
+    {
+      "documentId": "27fb78c15694159be669f739a17da275323bee3c75d7651883c2ec0100aec821",
+      "estado": "ACEPTADO",
+      "recepcionMs": 285,
+      "procesoMs": 768,
+      "historial": [
+        {
+          "estado": "RECIBIDO",
+          "fecha": "2026-10-26T04:53:22.225682267Z",
+          "detalle": "Solicitud validada y registrada"
+        },
+        {
+          "estado": "PROCESANDO",
+          "fecha": "2026-10-26T04:53:22.782195584Z",
+          "detalle": "Generando XML y PDF"
+        },
+        {
+          "estado": "ACEPTADO",
+          "fecha": "2026-10-26T04:53:22.993091600Z",
+          "detalle": "XML y PDF disponibles. Simulación académica."
+        }
+      ]
+    }
+  ]
+}

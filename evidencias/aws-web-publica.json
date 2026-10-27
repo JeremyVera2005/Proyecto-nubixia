@@ -1,0 +1,54 @@
+{
+  "date": "2026-10-26T05:37:23.239Z",
+  "url": "https://0qx6ww77nl.execute-api.us-east-2.amazonaws.com/demo/",
+  "results": [
+    {
+      "name": "Landing HTTPS publica",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "Cabeceras de seguridad",
+      "ok": true
+    },
+    {
+      "name": "CSS completo sin manejadores inline bloqueados por CSP",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "Configuracion Cognito sin clave compartida",
+      "ok": true
+    },
+    {
+      "name": "JavaScript publicado",
+      "ok": true,
+      "detail": 200
+    },
+    {
+      "name": "Logo PNG publicado",
+      "ok": true,
+      "detail": 336740
+    },
+    {
+      "name": "Datos protegidos sin sesion",
+      "ok": true,
+      "detail": 401
+    },
+    {
+      "name": "Token inventado rechazado",
+      "ok": true,
+      "detail": 401
+    },
+    {
+      "name": "Login Cognito real rechaza datos incorrectos",
+      "ok": true,
+      "detail": "NotAuthorizedException"
+    },
+    {
+      "name": "Registro real valida contrasena antes de crear cuenta",
+      "ok": true,
+      "detail": "InvalidPasswordException"
+    }
+  ]
+}

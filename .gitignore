@@ -1,0 +1,40 @@
+**/node_modules/
+**/target/
+**/dist/
+**/.angular/
+**/data/
+**/.aws-sam/
+*.log
+.env
+.env.*
+!.env.example
+*.pid
+
+.tools/
+
+# Paquetes, informes temporales y datos de desarrollo
+*.zip
+*.jar
+*.class
+**/__pycache__/
+*.py[cod]
+**/coverage/
+/.github/modernize/
+
+# Credenciales y material privado de autenticación
+.aws/
+**/.aws/
+*.pem
+*.key
+*.p12
+*.pfx
+credentials
+.DS_Store
+Thumbs.db
+
+# Capturas administrativas de la cuenta AWS
+/evidencias/permisos-aws.jpg
+/evidencias/aws-cloudformation-salidas.jpg
+/evidencias/revision-stack-escolar.jpg
+/evidencias/aws-cloudfront-verificacion.jpg
+/evidencias/aws-pagina-conectada.jpg

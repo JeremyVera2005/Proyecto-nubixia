@@ -1,0 +1,140 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ProjectStorage",
+      "Effect": "Allow",
+      "Action": "s3:*",
+      "Resource": [
+        "arn:aws:s3:::nubixia-escolar-*",
+        "arn:aws:s3:::nubixia-escolar-*/*"
+      ]
+    },
+    {
+      "Sid": "ProjectDatabase",
+      "Effect": "Allow",
+      "Action": "dynamodb:*",
+      "Resource": [
+        "arn:aws:dynamodb:us-east-2:002333107613:table/nubixia-escolar-*",
+        "arn:aws:dynamodb:us-east-2:002333107613:table/nubixia-escolar-*/*"
+      ]
+    },
+    {
+      "Sid": "ProjectQueues",
+      "Effect": "Allow",
+      "Action": "sqs:*",
+      "Resource": "arn:aws:sqs:us-east-2:002333107613:nubixia-escolar-*"
+    },
+    {
+      "Sid": "ProjectFunctions",
+      "Effect": "Allow",
+      "Action": "lambda:*",
+      "Resource": "arn:aws:lambda:us-east-2:002333107613:function:nubixia-escolar-*"
+    },
+    {
+      "Sid": "ProjectEventMappingCreate",
+      "Effect": "Allow",
+      "Action": "lambda:CreateEventSourceMapping",
+      "Resource": "*",
+      "Condition": {
+        "ArnLike": {
+          "lambda:FunctionArn": "arn:aws:lambda:us-east-2:002333107613:function:nubixia-escolar-*"
+        }
+      }
+    },
+    {
+      "Sid": "EventMappingManagement",
+      "Effect": "Allow",
+      "Action": [
+        "lambda:GetEventSourceMapping",
+        "lambda:UpdateEventSourceMapping",
+        "lambda:DeleteEventSourceMapping",
+        "lambda:TagResource",
+        "lambda:UntagResource",
+        "lambda:ListTags"
+      ],
+      "Resource": "arn:aws:lambda:us-east-2:002333107613:event-source-mapping:*"
+    },
+    {
+      "Sid": "ProjectLogs",
+      "Effect": "Allow",
+      "Action": "logs:*",
+      "Resource": [
+        "arn:aws:logs:us-east-2:002333107613:log-group:/aws/lambda/nubixia-escolar-*",
+        "arn:aws:logs:us-east-2:002333107613:log-group:/aws/lambda/nubixia-escolar-*:*"
+      ]
+    },
+    {
+      "Sid": "RegionalRestApiDeployment",
+      "Effect": "Allow",
+      "Action": [
+        "apigateway:GET",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:PATCH",
+        "apigateway:DELETE"
+      ],
+      "Resource": [
+        "arn:aws:apigateway:us-east-2::/restapis*",
+        "arn:aws:apigateway:us-east-2::/apikeys*",
+        "arn:aws:apigateway:us-east-2::/usageplans*",
+        "arn:aws:apigateway:us-east-2::/tags*"
+      ]
+    },
+    {
+      "Sid": "ProjectExecutionRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole",
+        "iam:GetRole",
+        "iam:DeleteRole",
+        "iam:UpdateAssumeRolePolicy",
+        "iam:PutRolePolicy",
+        "iam:GetRolePolicy",
+        "iam:DeleteRolePolicy",
+        "iam:ListRolePolicies",
+        "iam:ListAttachedRolePolicies",
+        "iam:TagRole",
+        "iam:UntagRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ApiFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-PublisherFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ProcessorFunctionRole-*"
+      ]
+    },
+    {
+      "Sid": "BasicLoggingManagedPolicy",
+      "Effect": "Allow",
+      "Action": [
+        "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy"
+      ],
+      "Resource": [
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ApiFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-PublisherFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ProcessorFunctionRole-*"
+      ],
+      "Condition": {
+        "ArnEquals": {
+          "iam:PolicyARN": "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+        }
+      }
+    },
+    {
+      "Sid": "PassOnlyProjectRolesToLambda",
+      "Effect": "Allow",
+      "Action": "iam:PassRole",
+      "Resource": [
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ApiFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-PublisherFunctionRole-*",
+        "arn:aws:iam::002333107613:role/nubixia-escolar-ProcessorFunctionRole-*"
+      ],
+      "Condition": {
+        "StringEquals": {
+          "iam:PassedToService": "lambda.amazonaws.com"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+<div class="shell">
+ <aside class="sidebar">
+  <a class="brand" href="#" (click)="$event.preventDefault(); page.set('dashboard')"><img src="nubixia-logo.png" alt="" width="60" height="60">nubixia<span class="brand-dot">.</span></a>
+  <span class="workspace-label">ESPACIO DE TRABAJO</span>
+  <nav aria-label="Principal">
+   <button [class.active]="page() === 'dashboard'" (click)="page.set('dashboard')"><span>▦</span> Comprobantes</button>
+   <button [class.active]="page() === 'new'" (click)="newInvoice()" [disabled]="!connected()"><span>＋</span> Nueva emisión</button>
+   @if(!useAuth){<button [class.active]="page() === 'settings'" (click)="page.set('settings')"><span>⚙</span> Conexión API</button>}
+  </nav>
+  <div class="sidebar-spacer"></div>
+  <div class="profile"><div class="avatar">{{useAuth?(auth.session()?.email?.charAt(0)?.toUpperCase() || 'N'):'N'}}</div><div><strong>{{useAuth?'Mi espacio':'Nubixia'}}</strong><small>{{useAuth?auth.session()?.email:'Comprobantes en orden'}}</small></div></div>
+  <button class="logout-button" (click)="signedOut.emit()">← {{useAuth?'Cerrar sesión':'Volver al inicio'}}</button>
+ </aside>
+ <main>
+  <header class="topbar"><span>Plataforma de comprobantes <span class="muted">/ {{ page() === 'new' ? 'Nueva emisión' : page() === 'settings' ? 'Conexión' : 'Resumen' }}</span></span><span class="connection" [class.online]="connected()"><i></i>{{ connected() ? (cloudMode() ? 'AWS conectado' : 'API conectada') : 'Sin conexión' }}</span></header>
+  <div class="content">
+   @if (error()) { <div class="alert error" role="alert">{{ error() }}<button aria-label="Cerrar error" (click)="error.set('')">×</button></div> }
+   @if (notice()) { <div class="alert success" role="status">{{ notice() }}<button aria-label="Cerrar aviso" (click)="notice.set('')">×</button></div> }
+   @if (page() === 'settings') {
+     @if (cloudMode()) {
+      <div class="eyebrow">CONEXIÓN AUTOMÁTICA</div><h1>Tu proyecto en AWS</h1>
+      <div class="card settings"><h2>Backend serverless conectado</h2>
+       <p>Los comprobantes se guardan en DynamoDB y sus archivos en S3. La conexión se configura automáticamente en esta computadora.</p>
+       <p class="help">La credencial privada permanece en el servidor local. No necesitas ingresarla en el navegador.</p>
+       <button class="primary" (click)="refresh()" [disabled]="loading()">{{ loading() ? 'Comprobando…' : 'Comprobar conexión' }}</button>
+      </div>
+     } @else {
+    <div class="eyebrow">CONFIGURACIÓN</div><h1>Conecta tu espacio de trabajo</h1><p class="subtitle">Ingresa la dirección de tu API y una credencial de acceso.</p>
+    <form class="card settings" (ngSubmit)="connect()">
+     <h2>Conexión con la API</h2>
+     <label>URL del backend<input name="url" [(ngModel)]="apiUrl" required type="url" placeholder="http://localhost:8080"></label>
+     <label>API key<input name="key" [(ngModel)]="apiKey" required type="password" autocomplete="off" placeholder="Tu credencial de acceso"></label>
+     <p class="help">Para la demo local: <code>nubixia-demo-local-2026</code>. La credencial se conserva solo durante esta sesión del navegador.</p>
+     <div class="actions"><button class="primary" type="submit" [disabled]="loading()">{{ loading() ? 'Conectando…' : 'Conectar API →' }}</button>@if (connected()) { <button type="button" class="secondary" (click)="disconnect()">Cerrar sesión</button> }</div>
+    </form>
+     }
+   }
+   @if (page() === 'dashboard') {
+    <div class="page-heading"><div><div class="eyebrow">TU ACTIVIDAD, EN UN SOLO LUGAR</div><h1>Comprobantes</h1><p class="subtitle">Emite, consulta y descarga tus comprobantes de prueba.</p></div><button class="primary" (click)="newInvoice()" [disabled]="!connected()">＋ Nuevo comprobante</button></div>
+    <section class="stats" aria-label="Estadísticas">
+     <div class="stat"><div class="stat-top">Comprobantes registrados <span>▤</span></div><strong>{{ documents().length }}</strong><small>Historial de emisiones</small></div>
+     <div class="stat"><div class="stat-top">Aceptados <span class="green">✓</span></div><strong>{{ accepted() }}</strong><small><i class="dot green-bg"></i> Archivos disponibles</small></div>
+     <div class="stat"><div class="stat-top">En procesamiento <span class="amber">◷</span></div><strong>{{ pending() }}</strong><small>{{ cloudMode() ? 'Consulta automática mientras hay pendientes' : 'Actualización cada 5 segundos' }}</small></div>
+     <div class="stat"><div class="stat-top">Total aceptado <span>S/</span></div><strong>{{ totalIssued() | currency:'PEN':'S/ ':'1.2-2' }}</strong><small>Soles peruanos · incluye IGV</small></div>
+    </section>
+    <section class="card registry">
+     <div class="section-heading"><div><h2>Historial de comprobantes</h2><p>Consulta el estado y los archivos de cada emisión.</p></div><button class="secondary" (click)="refresh()" [disabled]="loading() || !apiKey">{{ loading() ? 'Actualizando…' : '↻ Actualizar' }}</button></div>
+     <div class="filters"><input aria-label="Buscar comprobantes" placeholder="Buscar por cliente, serie o identificador…" [ngModel]="search()" (ngModelChange)="search.set($event)"><select aria-label="Filtrar estado" [ngModel]="status()" (ngModelChange)="status.set($event)"><option value="">Todos los estados</option>@for (s of ['RECIBIDO','PROCESANDO','ACEPTADO','RECHAZADO','ERROR']; track s) { <option [value]="s">{{ s }}</option> }</select></div>
+     <div class="table-scroll"><table><thead><tr><th>COMPROBANTE / CLIENTE</th><th>FECHA</th><th>TOTAL</th><th>ESTADO</th><th></th></tr></thead><tbody>
+      @for (doc of filtered(); track doc.documentId) {
+       <tr><td><strong>{{ doc.comprobante.serie }}-{{ doc.comprobante.numero }}</strong><small>{{ doc.comprobante.cliente }}</small></td><td>{{ doc.comprobante.fecha }}</td><td class="amount">{{ doc.comprobante.total | currency:'PEN':'S/ ' }}</td><td><span class="badge" [attr.data-status]="doc.estado">{{ doc.estado }}</span></td><td><button class="text-button" (click)="selected.set(doc)">Ver detalle ↗</button></td></tr>
+      } @empty { <tr><td colspan="5"><div class="empty"><span>▤</span><h3>{{ search() || status() ? 'No hay coincidencias' : 'Tu primera emisión empieza aquí' }}</h3><p>{{ search() || status() ? 'Prueba con otro cliente o estado.' : 'Crea un comprobante para ver su procesamiento y descargar sus archivos.' }}</p></div></td></tr> }
+     </tbody></table></div>
+     <div class="table-footer">{{ filtered().length }} comprobantes <span><i class="dot green-bg"></i> Consulta automática de estados</span></div>
+    </section>
+    <form class="lookup" (ngSubmit)="consult(lookup.value)"><label for="lookup">¿Tienes un identificador?</label><input #lookup id="lookup" placeholder="Pega el documentId para consultar" maxlength="64"><button class="secondary" type="submit" [disabled]="!connected()">Consultar</button></form>
+   }
+   @if (page() === 'new') {
+    <div class="page-heading"><div><div class="eyebrow">NUEVA EMISIÓN</div><h1>Crear comprobante</h1><p class="subtitle">Completa los datos. Calcularemos los importes por ti.</p></div><button class="secondary" (click)="page.set('dashboard')">← Volver</button></div>
+    <form #invoiceForm="ngForm" (ngSubmit)="submit()" class="invoice-form">
+     <section class="card form-section"><h2><span class="step">1</span> Datos del comprobante</h2><div class="form-grid">
+      <label>RUC del emisor<input name="ruc" [(ngModel)]="form.rucEmisor" required pattern="[0-9]{11}" maxlength="11" inputmode="numeric" placeholder="20123456789"></label>
+      <label class="wide">Cliente o razón social<input name="cliente" [(ngModel)]="form.cliente" required maxlength="200" placeholder="Nombre del cliente"></label>
+      <label>Fecha de emisión<input name="fecha" type="date" [(ngModel)]="form.fecha" required></label>
+      <label>Serie<input name="serie" [(ngModel)]="form.serie" required pattern="[FB][A-Z0-9]{3}" maxlength="4" placeholder="F001"></label>
+      <label>Número<input name="numero" [(ngModel)]="form.numero" required pattern="[0-9]{1,8}" maxlength="8" inputmode="numeric" placeholder="1"></label>
+     </div></section>
+     <section class="card form-section"><div class="section-heading"><h2><span class="step">2</span> Productos y servicios</h2><button type="button" class="secondary" (click)="addItem()" [disabled]="form.items.length >= 100">＋ Agregar ítem</button></div>
+      @for (item of form.items; track $index; let idx = $index) {
+       <div class="item-row"><label class="description">Descripción<input [name]="'descripcion'+idx" [(ngModel)]="item.descripcion" required maxlength="200" placeholder="Producto o servicio"></label><label>Cantidad<input [name]="'cantidad'+idx" type="number" [(ngModel)]="item.cantidad" required min="0.001" max="1000000" step="0.001"></label><label>Precio unit. S/<input [name]="'precio'+idx" type="number" [(ngModel)]="item.precioUnitario" required min="0" max="10000000" step="0.01"></label><div class="line-total"><small>Importe S/</small><strong>{{ round(item.cantidad * item.precioUnitario) | number:'1.2-2' }}</strong></div><button type="button" class="remove" (click)="removeItem(idx)" [disabled]="form.items.length === 1" [attr.aria-label]="'Eliminar ítem '+(idx+1)">×</button></div>
+      }
+      <div class="totals"><div><span>Subtotal</span><strong>{{ subtotal | currency:'PEN':'S/ ' }}</strong></div><div><span>IGV (18%)</span><strong>{{ igv | currency:'PEN':'S/ ' }}</strong></div><div class="grand-total"><span>Total a emitir</span><strong>{{ total | currency:'PEN':'S/ ' }}</strong></div></div>
+     </section>
+     <div class="submit-row"><p>La solicitud se procesará de forma asíncrona.<br>Podrás consultar el estado y descargar XML/PDF.</p><button class="primary" type="submit" [disabled]="invoiceForm.invalid || busy() || !connected()">{{ busy() ? 'Registrando…' : 'Emitir comprobante →' }}</button></div>
+    </form>
+   }
+   <footer>© {{ 2026 }} Nubixia <span>Simulación académica · Sin validez tributaria · Sin conexión con SUNAT</span></footer>
+  </div>
+ </main>
+</div>
+@if (selected(); as doc) {
+ <div class="overlay" (click)="selected.set(null)"><section class="detail" role="dialog" aria-modal="true" aria-label="Detalle del comprobante" (click)="$event.stopPropagation()" (keydown.escape)="selected.set(null)" tabindex="0">
+  <div class="section-heading"><span class="eyebrow">DETALLE DEL COMPROBANTE</span><button class="close" aria-label="Cerrar detalle" (click)="selected.set(null)">×</button></div>
+  <h2>{{ doc.comprobante.serie }}-{{ doc.comprobante.numero }}</h2><p>{{ doc.comprobante.cliente }}</p><span class="badge" [attr.data-status]="doc.estado">{{ doc.estado }}</span>
+  <dl><dt>Identificador</dt><dd class="document-id">{{ doc.documentId }}</dd><dt>Emisor</dt><dd>{{ doc.comprobante.rucEmisor }}</dd><dt>Fecha de emisión</dt><dd>{{ doc.comprobante.fecha }}</dd><dt>Total con IGV</dt><dd class="detail-total">{{ doc.comprobante.total | currency:'PEN':'S/ ' }}</dd></dl>
+  @if (doc.error) { <div class="alert error">{{ doc.error }}</div> }
+  <h3>Trazabilidad</h3><ol class="timeline">@for (event of doc.historial; track $index) { <li><strong>{{ event.estado }}</strong><small>{{ event.fecha | date:'dd/MM/yyyy HH:mm:ss' }}</small><p>{{ event.detalle }}</p></li> }</ol>
+  <div class="actions"><button class="primary" [disabled]="!doc.archivosDisponibles || !!downloading()" (click)="download(doc,'pdf')">{{ downloading() === 'pdf' ? 'Descargando…' : '↓ Descargar PDF' }}</button><button class="secondary" [disabled]="!doc.archivosDisponibles || !!downloading()" (click)="download(doc,'xml')">{{ downloading() === 'xml' ? 'Descargando…' : '↓ XML' }}</button></div>
+  <button class="text-button refresh-detail" (click)="consult(doc.documentId)">↻ Consultar estado</button><p class="help">Representación ficticia sin validez tributaria.</p>
+ </section></div>
+}

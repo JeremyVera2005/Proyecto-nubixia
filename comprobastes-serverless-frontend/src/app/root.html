@@ -1,0 +1,59 @@
+@if(view()==='workspace') {
+ <app-workspace (signedOut)="logout()" />
+} @else {
+ <div class="public-shell">
+  <header class="public-nav"><a class="wordmark" href="#" (click)="$event.preventDefault();go('landing')"><img src="nubixia-logo.png" alt="" width="58" height="58">nubixia<span>•</span></a>
+   @if(view()==='landing') {<nav aria-label="Página principal"><a href="#features">Lo que puedes hacer</a><a href="#how">Cómo funciona</a></nav>}
+   <div class="nav-actions"><button class="plain" (click)="go('login')">Ingresar</button><button class="solid" (click)="go('register')">Crear cuenta <span>↗</span></button></div>
+  </header>
+  @if(view()==='landing') {
+   <main class="landing">
+    <section class="hero"><div class="hero-copy"><div class="pill"><i></i> MENOS PAPELEO. MÁS CLARIDAD.</div>
+     <h1>Tus comprobantes.<br>En orden.<br><em>Sin complicarte.</em></h1>
+     <p>Emite, organiza y encuentra tus comprobantes en un solo lugar. De la primera emisión al último archivo, todo bajo control.</p>
+     <div class="hero-actions"><button class="solid large" (click)="go('register')">Empieza con tu cuenta <span>↗</span></button><a href="#how">Mira cómo funciona <span>↓</span></a></div>
+     <div class="hero-note"><span>✓ Sin instalaciones</span><span>✓ Acceso desde tu navegador</span></div>
+    </div><div class="hero-art" aria-label="Vista previa del panel de comprobantes"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+     <div class="floating-label"><span>✦</span> Cada emisión, en su lugar.</div>
+     <div class="product-preview"><div class="preview-top"><span class="mini-brand"><img src="nubixia-logo.png" alt="" width="42" height="42">nubixia</span><span class="preview-dot">● <span>Tu espacio</span></span></div>
+      <div class="preview-heading"><div><small>VISTA GENERAL</small><h2>Todo al día.</h2></div><span class="preview-add">＋ Nueva emisión</span></div>
+      <div class="preview-stats"><div><small>Comprobantes</small><strong>24<span>↗</span></strong></div><div><small>Total emitido</small><strong>S/ 2,832<small>.00</small></strong></div></div>
+      <div class="preview-list-head">Últimos movimientos <span>Ver todos ↗</span></div>
+      <div class="preview-row"><b class="file-icon">↗</b><div><strong>F001-000024</strong><small>Estudio Creativo</small></div><b>S/ 118.00</b><span>Listo</span></div>
+      <div class="preview-row"><b class="file-icon">↗</b><div><strong>F001-000023</strong><small>Comercial del Norte</small></div><b>S/ 354.00</b><span>Listo</span></div>
+      <div class="preview-row"><b class="file-icon">↗</b><div><strong>F001-000022</strong><small>Servicios Integrales</small></div><b>S/ 236.00</b><span>Listo</span></div>
+      <div class="preview-bottom">Ejemplo ilustrativo del panel <span>↗</span></div>
+     </div><div class="floating-receipt"><span class="receipt-check">✓</span><div><strong>Comprobante listo</strong><small>XML + PDF disponibles</small></div><span>↗</span></div>
+    </div></section>
+    <section class="intro-line"><span>DE LA EMISIÓN AL ARCHIVO.</span><p>Un flujo simple.<br><strong>Más tiempo para lo que importa.</strong></p><span class="intro-arrow">↙</span></section>
+    <section id="features" class="feature-section"><div class="section-title"><span>01 / HECHO PARA TU DÍA A DÍA</span><h2>Todo lo que necesitas.<br>Nada que estorbe.</h2></div>
+     <div class="feature-grid"><article><span class="feature-icon">↗</span><h3>Emite con confianza</h3><p>Ingresa los datos y productos. El subtotal, IGV y total se calculan automáticamente.</p><small>01 — EMISIÓN</small></article><article><span class="feature-icon">◎</span><h3>Conoce cada estado</h3><p>Sigue el recorrido de cada comprobante, desde su recepción hasta que esté listo.</p><small>02 — SEGUIMIENTO</small></article><article><span class="feature-icon">↓</span><h3>Encuentra y descarga</h3><p>Busca por cliente o número y descarga XML y PDF cuando los necesites.</p><small>03 — ORGANIZACIÓN</small></article></div>
+    </section>
+    <section id="how" class="how-section"><div><span class="section-kicker">02 / ASÍ DE SIMPLE</span><h2>Del dato al documento.<br>En tres pasos.</h2><button class="solid" (click)="go('register')">Crea tu espacio <span>↗</span></button></div><ol><li><span>01</span><div><h3>Crea tu cuenta</h3><p>Regístrate con tu correo y confirma que eres tú.</p></div></li><li><span>02</span><div><h3>Emite tu comprobante</h3><p>Completa los datos. Nosotros hacemos los cálculos.</p></div></li><li><span>03</span><div><h3>Todo queda organizado</h3><p>Consulta su estado y descarga los archivos desde tu panel.</p></div></li></ol></section>
+    <section class="final-cta"><div><span>TU PRÓXIMA EMISIÓN EMPIEZA AQUÍ.</span><h2>Menos vueltas.<br><em>Más orden.</em></h2></div><button class="light-button" (click)="go('register')">Crear mi cuenta <span>↗</span></button></section>
+   </main>
+  } @else {
+   <main class="auth-layout"><aside class="auth-story"><span class="section-kicker">BIENVENIDO A TU NUEVO ESPACIO</span><h1>Un lugar para<br>tenerlo todo<br><em>en orden.</em></h1><p>Cada comprobante, cada archivo y cada movimiento. Justo donde lo necesitas.</p><div class="auth-note"><span>✓</span><div><strong>Tu cuenta. Tus comprobantes.</strong><p>Un espacio personal para organizar tus emisiones.</p></div></div><span class="auth-decoration">n.</span></aside>
+    <section class="auth-card"><button class="back-link" (click)="go('landing')">← Volver al inicio</button><span class="section-kicker">TU ESPACIO NUBIXIA</span>
+     <h2>{{view()==='register'?'Empecemos.':view()==='confirm'?'Confirma tu correo.':view()==='forgot'?'Recupera tu acceso.':view()==='reset'?'Una nueva contraseña.':'Qué bueno verte.'}}</h2>
+     <p class="auth-subtitle">{{view()==='register'?'Crea tu cuenta y empieza a organizar tus comprobantes.':view()==='confirm'?'Ingresa el código que enviamos a tu correo.':view()==='forgot'?'Te enviaremos un código para restablecer tu contraseña.':view()==='reset'?'Ingresa el código recibido y elige una nueva contraseña.':'Ingresa a tu cuenta para continuar.'}}</p>
+     @if(error()){<div class="auth-alert" role="alert">{{error()}}</div>} @if(notice()){<div class="auth-notice" role="status">{{notice()}}</div>}
+     <form (ngSubmit)="submit()">
+      @if(view()==='register'){<label>Tu nombre<input name="name" [(ngModel)]="name" autocomplete="name" placeholder="¿Cómo te llamas?" maxlength="100" required></label>}
+      <label>Correo electrónico<input name="email" type="email" [(ngModel)]="email" autocomplete="email" placeholder="tu@correo.com" required maxlength="254" [readOnly]="view()==='confirm'||view()==='reset'"></label>
+      @if(view()==='confirm'||view()==='reset'){<label>Código de verificación<input name="code" [(ngModel)]="code" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6}" maxlength="6" placeholder="000000" required></label>}
+      @if(view()==='login'||view()==='register'||view()==='reset'){<label>{{view()==='reset'?'Nueva contraseña':'Contraseña'}}<input name="password" type="password" [(ngModel)]="password" [autocomplete]="view()==='login'?'current-password':'new-password'" placeholder="Tu contraseña" [minlength]="view()==='login'?1:10" maxlength="256" required></label>}
+      @if(view()==='register'){<p class="password-hint">Al menos 10 caracteres, mayúscula, minúscula y número.</p><label>Confirma tu contraseña<input name="passwordAgain" type="password" [(ngModel)]="passwordAgain" autocomplete="new-password" placeholder="Repite tu contraseña" required></label>}
+      @if(view()==='login'){<button type="button" class="forgot-link" (click)="go('forgot')">Olvidé mi contraseña</button>}
+      <button class="solid auth-submit" type="submit" [disabled]="busy()||!ready()">{{busy()?'Un momento…':view()==='register'?'Crear mi cuenta':view()==='confirm'?'Confirmar correo':view()==='forgot'?'Enviar código':view()==='reset'?'Actualizar contraseña':'Ingresar a mi espacio'}} <span>↗</span></button>
+     </form>
+     @if(view()==='confirm'){<button class="resend-link" [disabled]="busy()" (click)="resend()">Reenviar código</button><button class="resend-link" (click)="go('register')">Usar otro correo</button>}
+     <p class="auth-switch">{{view()==='register'?'¿Ya tienes cuenta?':'¿Primera vez por aquí?'}} <button (click)="go(view()==='register'?'login':'register')">{{view()==='register'?'Inicia sesión':'Crea tu cuenta'}}</button></p>
+     @if(local&&!auth.config){<button class="local-preview" (click)="view.set('workspace')">Ver panel de demostración local →</button>}
+     <p class="privacy-note">Simulación académica. Los documentos generados no tienen validez tributaria.</p>
+    </section>
+   </main>
+  }
+  <footer class="public-footer"><a class="wordmark" href="#" (click)="$event.preventDefault();go('landing')"><img src="nubixia-logo.png" alt="" width="48" height="48">nubixia<span>•</span></a><span>Más claridad en cada emisión.</span><small>© 2026 Nubixia · Simulación académica sin validez tributaria.</small></footer>
+ </div>
+}

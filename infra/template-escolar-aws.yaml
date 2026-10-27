@@ -1,0 +1,257 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Nubixia escolar - despliegue minimo; requiere verificar cobertura gratuita
+Parameters:
+  ApiKeyValue:
+    Type: String
+    NoEcho: true
+    MinLength: 20
+    MaxLength: 128
+    AllowedPattern: '[A-Za-z0-9]+'
+    Description: Credencial alfanumerica privada para la demostracion
+  CorsOrigin:
+    Type: String
+    Default: http://localhost:4200
+    Description: Origen exacto del frontend, sin barra final
+Globals:
+  Function:
+    Runtime: java17
+    MemorySize: 512
+    Timeout: 30
+    CodeUri: s3://nubixia-escolar-deploy-002333107613-use2/comprobantes-serverless-1.0.0-lambda.jar
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref Documents
+        BUCKET_NAME: !Ref Artifacts
+        CORS_ORIGIN: !Ref CorsOrigin
+Resources:
+  Api:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: demo
+      Cors:
+        AllowOrigin: !Sub "'${CorsOrigin}'"
+        AllowHeaders: "'Content-Type,X-API-Key'"
+        AllowMethods: "'GET,POST,OPTIONS'"
+      Auth:
+        ApiKeyRequired: true
+        AddApiKeyRequiredToCorsPreflight: false
+      MethodSettings:
+        - ResourcePath: '/*'
+          HttpMethod: '*'
+          MetricsEnabled: false
+          ThrottlingRateLimit: 1
+          ThrottlingBurstLimit: 25
+      GatewayResponses:
+        DEFAULT_4XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: !Sub "'${CorsOrigin}'"
+              Access-Control-Allow-Headers: "'Content-Type,X-API-Key'"
+        DEFAULT_5XX:
+          ResponseParameters:
+            Headers:
+              Access-Control-Allow-Origin: !Sub "'${CorsOrigin}'"
+  DemoKey:
+    Type: AWS::ApiGateway::ApiKey
+    Properties:
+      Enabled: true
+      Value: !Ref ApiKeyValue
+  UsagePlan:
+    Type: AWS::ApiGateway::UsagePlan
+    DependsOn: ApidemoStage
+    Properties:
+      ApiStages:
+        - ApiId: !Ref Api
+          Stage: demo
+      Throttle:
+        RateLimit: 1
+        BurstLimit: 25
+      Quota:
+        Limit: 500
+        Period: DAY
+  PlanKey:
+    Type: AWS::ApiGateway::UsagePlanKey
+    Properties:
+      KeyId: !Ref DemoKey
+      KeyType: API_KEY
+      UsagePlanId: !Ref UsagePlan
+  Documents:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: documentId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: documentId
+          KeyType: HASH
+      SSESpecification:
+        SSEEnabled: true
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: false
+      StreamSpecification:
+        StreamViewType: NEW_IMAGE
+  Artifacts:
+    Type: AWS::S3::Bucket
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedOrigins: [!Ref CorsOrigin]
+            AllowedMethods: [GET]
+            AllowedHeaders: ['*']
+            MaxAge: 300
+  ArtifactsPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref Artifacts
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Deny
+            Principal: '*'
+            Action: 's3:*'
+            Resource:
+              - !GetAtt Artifacts.Arn
+              - !Sub '${Artifacts.Arn}/*'
+            Condition:
+              Bool:
+                aws:SecureTransport: false
+  DeadLetterQueue:
+    Type: AWS::SQS::Queue
+    Properties:
+      MessageRetentionPeriod: 1209600
+      SqsManagedSseEnabled: true
+  Queue:
+    Type: AWS::SQS::Queue
+    Properties:
+      VisibilityTimeout: 180
+      MessageRetentionPeriod: 345600
+      SqsManagedSseEnabled: true
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt DeadLetterQueue.Arn
+        maxReceiveCount: 5
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: pe.nubixia.comprobantes_serverless.ApiHandler::handleRequest
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:GetItem, dynamodb:PutItem, dynamodb:Scan]
+              Resource: !GetAtt Documents.Arn
+            - Effect: Allow
+              Action: s3:GetObject
+              Resource: !Sub '${Artifacts.Arn}/*'
+      Events:
+        Create:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /comprobantes
+            Method: post
+        List:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /comprobantes
+            Method: get
+        Get:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /comprobantes/{id}
+            Method: get
+        Download:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /comprobantes/{id}/archivos/{extension}
+            Method: get
+        Health:
+          Type: Api
+          Properties:
+            RestApiId: !Ref Api
+            Path: /health
+            Method: get
+            Auth:
+              ApiKeyRequired: false
+  PublisherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: pe.nubixia.comprobantes_serverless.PublisherHandler::handleRequest
+      Environment:
+        Variables:
+          QUEUE_URL: !Ref Queue
+      Policies:
+        - SQSSendMessagePolicy:
+            QueueName: !GetAtt Queue.QueueName
+      Events:
+        Outbox:
+          Type: DynamoDB
+          Properties:
+            Stream: !GetAtt Documents.StreamArn
+            StartingPosition: TRIM_HORIZON
+            BatchSize: 10
+            BisectBatchOnFunctionError: true
+            FilterCriteria:
+              Filters:
+                - Pattern: '{"eventName":["INSERT"]}'
+  ProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: pe.nubixia.comprobantes_serverless.ProcessorHandler::handleRequest
+      Policies:
+        - Statement:
+            - Effect: Allow
+              Action: [dynamodb:GetItem, dynamodb:PutItem]
+              Resource: !GetAtt Documents.Arn
+            - Effect: Allow
+              Action: s3:PutObject
+              Resource: !Sub '${Artifacts.Arn}/*'
+      Events:
+        Work:
+          Type: SQS
+          Properties:
+            Queue: !GetAtt Queue.Arn
+            BatchSize: 5
+            FunctionResponseTypes: [ReportBatchItemFailures]
+            ScalingConfig:
+              MaximumConcurrency: 2
+  ApiLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ApiFunction}'
+      RetentionInDays: 3
+  PublisherLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${PublisherFunction}'
+      RetentionInDays: 3
+  ProcessorLogs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub '/aws/lambda/${ProcessorFunction}'
+      RetentionInDays: 3
+Outputs:
+  ApiUrl:
+    Value: !Sub 'https://${Api}.execute-api.${AWS::Region}.amazonaws.com/demo'
+  BucketName:
+    Value: !Ref Artifacts
+  TableName:
+    Value: !Ref Documents
+  QueueUrl:
+    Value: !Ref Queue
+  DeadLetterQueueUrl:
+    Value: !Ref DeadLetterQueue
+  ApiKeyId:
+    Value: !Ref DemoKey
