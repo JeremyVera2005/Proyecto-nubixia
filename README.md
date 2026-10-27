@@ -9,7 +9,35 @@ Abre [Nubixia en AWS](https://0qx6ww77nl.execute-api.us-east-2.amazonaws.com/dem
 Frontend y backend funcionan en AWS, Incluye landing page, logo nuevo, registro, confirmación de correo, inicio/cierre de sesión y recuperación de contraseña con Cognito Lite. Cada usuario ve sus propios comprobantes. La base y los archivos siguen en DynamoDB y S3 privado.
 
 
-## Iniciar en Windows para desarrollo local
+## Ejecutar con Docker Desktop
+
+Desde la raíz, con Docker Desktop en modo Linux:
+
+```powershell
+docker compose up -d --build --wait
+docker compose ps
+```
+
+Abre http://localhost:8088. Pulsa **Ingresar** y **Ver panel de demostración local**. Nginx sirve Angular y reenvía `/api/` al contenedor Java a través de una red Docker interna. Puedes consultar http://localhost:8088/api/health para diagnóstico. Solo el frontend publica un puerto, limitado a la interfaz local; el backend permanece accesible en la red interna de Compose.
+
+Las imágenes `nubixia/frontend:1.0.0` y `nubixia/backend:1.0.0` se compilan con Dockerfiles multietapa. La imagen Java final contiene un JRE, sin Maven; la imagen web contiene Nginx y los archivos compilados, sin Node ni las dependencias de desarrollo. Ambos contenedores ejecutan procesos sin privilegios de root y disponen de healthchecks. Compose espera a que el backend esté saludable antes de iniciar la web.
+
+La demostración Docker usa H2 y Flyway dentro del backend y conserva sus datos en el volumen `nubixia_nubixia-data`. No crea otra base DynamoDB ni reemplaza el despliegue AWS. Este perfil local utiliza la clave de demostración; el proxy la incorpora en el servidor y no habilita cuentas Cognito. El sitio AWS conserva Cognito y su infraestructura actual.
+
+Variables opcionales del proceso: `NUBIXIA_IMAGE_TAG`, `NUBIXIA_WEB_PORT`, `NUBIXIA_API_KEY`, `NUBIXIA_DB_PASSWORD` y `NUBIXIA_RATE_LIMIT`. Ejemplo antes de levantar los contenedores:
+
+```powershell
+$env:NUBIXIA_WEB_PORT = '8088'
+docker compose up -d --build --wait
+# Prueba HTTP desde un contenedor temporal dentro de la red privada
+docker compose --profile tools run --rm verify
+# Detener conservando los datos
+docker compose down
+```
+
+Evita `docker compose down -v` si necesitas conservar la base: esa opción elimina el volumen. No publiques este perfil de demostración en Internet. Los contextos de compilación excluyen credenciales, datos, herramientas temporales y dependencias locales mediante `.dockerignore`.
+
+## Ejecutar sin contenedores
 
 La landing se abre primero. Para usar el backend local H2, elige Ingresar y luego Ver panel de demostración local. Ese acceso solo se muestra en localhost cuando no hay Cognito configurado. La web pública siempre exige una sesión real.
 
