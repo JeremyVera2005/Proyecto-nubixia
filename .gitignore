@@ -38,3 +38,16 @@ Thumbs.db
 /evidencias/revision-stack-escolar.jpg
 /evidencias/aws-cloudfront-verificacion.jpg
 /evidencias/aws-pagina-conectada.jpg
+
+# El repositorio contiene solo el proyecto y su configuración técnica
+/evidencias/
+/docs/**
+!/docs/ejemplo-comprobante.json
+/CHANGELOG.md
+/scripts/avance2_figures.py
+/scripts/build_avance2_document.py
+*.docx
+*.doc
+*.pdf
+*.pptx
+*.xlsx

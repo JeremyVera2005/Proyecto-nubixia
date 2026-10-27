@@ -4,7 +4,7 @@ Aplicación completa con frontend Angular y backend Java 17 / Spring Boot. Recib
 
 ## Código y versionado
 
-Repositorio: [JeremyVera2005/Proyecto-nubixia](https://github.com/JeremyVera2005/Proyecto-nubixia). El versionado del proyecto completo comienza con la línea base del 26 de octubre de 2026. Consulta el [flujo de trabajo Git](docs/VERSIONADO.md) y el [registro de cambios](CHANGELOG.md). Subir código a GitHub no despliega automáticamente en AWS.
+Repositorio: [JeremyVera2005/Proyecto-nubixia](https://github.com/JeremyVera2005/Proyecto-nubixia). El versionado del proyecto completo comienza con la línea base del 26 de octubre de 2026. Subir código a GitHub no despliega automáticamente en AWS.
 
 ## Sitio en AWS
 
@@ -12,7 +12,7 @@ Abre [Nubixia en AWS](https://0qx6ww77nl.execute-api.us-east-2.amazonaws.com/dem
 
 Frontend y backend funcionan en AWS; no necesitas mantener esta computadora encendida. Incluye landing page, logo nuevo, registro, confirmación de correo, inicio/cierre de sesión y recuperación de contraseña con Cognito Lite. Cada usuario ve sus propios comprobantes. La base y los archivos siguen en DynamoDB y S3 privado.
 
-La cuenta bloqueó CloudFront por verificación pendiente. Se publicó por HTTPS mediante API Gateway y Lambda. La plantilla operativa es `infra/template-web-api-auth.json`. Consulta [estado del despliegue](docs/ESTADO-DESPLIEGUE-AWS.md) y [autenticación](docs/AUTENTICACION.md).
+La cuenta bloqueó CloudFront por verificación pendiente. Se publicó por HTTPS mediante API Gateway y Lambda. La plantilla operativa es `infra/template-web-api-auth.json`. Consulta estado del despliegue y autenticación.
 
 ## Iniciar en Windows para desarrollo local
 
@@ -55,7 +55,7 @@ $env:NUBIXIA_CORS_ORIGIN = 'http://localhost:4200'
 
 ## Comportamiento y persistencia
 
-- Local: base SQL H2 persistente en `comprobantes-serverless/data/nubixia.mv.db`, con tablas de comprobantes, ítems, historial y archivos XML/PDF. Flyway crea el esquema; se importan automáticamente los JSON anteriores. Cuatro trabajadores recuperan pendientes desde SQL. Consulta [acceso y consultas SQL](docs/BASE-DE-DATOS.md).
+- Local: base SQL H2 persistente en `comprobantes-serverless/data/nubixia.mv.db`, con tablas de comprobantes, ítems, historial y archivos XML/PDF. Flyway crea el esquema; se importan automáticamente los JSON anteriores. Cuatro trabajadores recuperan pendientes desde SQL. Consulta acceso y consultas SQL.
 - AWS: API Gateway, tres Lambda, DynamoDB bajo demanda con Streams, SQS con DLQ, S3 privado, CloudWatch e IAM.
 - Flujo: RECIBIDO → PROCESANDO → ACEPTADO. Datos inválidos en recepción devuelven 400 sin crear registro. RECHAZADO se reserva para datos inválidos detectados en procesamiento. Fallos técnicos se registran como ERROR y se reintentan.
 - Identidad del comprobante: RUC + serie + número normalizado. El mismo contenido devuelve el original con `duplicado: true`; cambiar el contenido manteniendo esa identidad produce 409.
